@@ -4,9 +4,11 @@
 
 from lib204 import wff
 P, Q, R, S, T = map(wff.Variable, 'PQRST')
-s1 = P
-s2 = Q
-s3 = R
-s4 = S
-s5 = T
-s6 = P
+
+s1 = ((P|Q)&(P|~Q))
+s2 = ((~S|P)&(S|P))
+s3 = ((S|~P)|~Q)
+s4 = (Q|(P|~S))
+
+s5 = (~(R|~T)|(~T>>(S&~R)))
+s6 = ((R>>T)>>((T&~R)|S))
