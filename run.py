@@ -38,9 +38,10 @@ print(" s6: %s" % s6)
 #     theories. These are two wrong answers, but they give you an idea of how
 #     to write your response.
 
-q1b = [ [s1,s2,s3,s4] ] # they are all equivalent.
+#q1b = [ [s1,s2,s3,s4] ] # they are all equivalent.
 #q1b = [ [s1], [s2], [s3], [s4] ] # they are all different
 #q1b = ??? # the right answer please!
+q1b = [[s1,s2],[s3,s4]]
 
 # (c) Variable q1c should be a dictionary mapping variables to True or False.
 #     Use only what you need of P, Q, R, S, T. An example (almost certainly
@@ -68,8 +69,8 @@ print("s5 = %s" % s5.dump('python'))
 print("s6 = %s" % s6.dump('python'))
 
 # replace the following two lines with what the above code prints
-s5 = ~(P | Q)
-s6 = (P & Q) | R
+s5 = (~(R|~T)|(~T>>(S&~R)))
+s6 = ((R>>T)>>((T&~R)|S))
 
 # (a) Put the parse trees inside folder Q2a. You can do it on paper and take a
 #     photo, or use drawing software. This will not be marked unless requested,
@@ -87,12 +88,13 @@ s6 = (P & Q) | R
 #      - etc.
 
 s5nnf = [
-    [~(P | Q), 'starting formula'],
-    [~P & ~Q, 'de Morgans']
+    [(~(R|~T)|(~T>>(S&~R))), 'starting formula'],
+    [(~(R|~T)|(~~T|(S&~R))),'replace implications'],
+    [(~(R|~T)|(T|(S&~R))),'double negation']
 ]
 
 s6nnf = [
-    [(P & Q) | R, 'starting formula -- already in negation normal form']
+    [((R>>T)>>((T&~R)|S)), 'starting formula -- already in negation normal form']
 ]
 
 
@@ -102,13 +104,11 @@ s6nnf = [
 #     an explanation for each step. Possible explanations are listed above.
 
 s5cnf = [
-    [~(P | Q), 'starting formula'],
-    [~P & ~Q, 'de Morgans']
+    [(~(R|~T)|(~T>>(S&~R))), 'starting formula']
 ]
 
 s6cnf = [
-    [(P & Q) | R, 'starting formula'],
-    [(P | R) & (Q | R), 'distribution']
+    [((R>>T)>>((T&~R)|S)), 'starting formula']
 ]
 
 
@@ -120,11 +120,17 @@ s6cnf = [
 # e.g., s5 = ~(P | Q)
 s5tseitin = semantic_interface.Encoding()
 # first argument is the formula; second is the variable name.
-x1 = s5tseitin.tseitin(P | Q, 'x1')
-x2 = s5tseitin.tseitin(~x1, 'x2')
+x1 = s5tseitin.tseitin(~T, 'x1')
+x2 = s5tseitin.tseitin(R|x1, 'x2')
+x3 = s5tseitin.tseitin(~x2,'x3')
+x4 = s5tseitin.tseitin(~T,'x4')
+x5 = s5tseitin.tseitin(~R,'x5')
+x6 = s5tseitin.tseitin(S|x5,'x6')
+x7 = s5tseitin.tseitin(x4>>x5,'x7')
+x8 = s5tseitin.tseitin(x3|x7,'x8')
 # This final step is required -- use your last variable, corresponding to the top
 #  of the parse tree, to finalize your Tseitin encoding.
-s5tseitin.finalize(x2)
+s5tseitin.finalize(x8)
 
 # e.g., s6 = (P & Q) | R
 s6tseitin = semantic_interface.Encoding()
